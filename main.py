@@ -7,7 +7,7 @@ import argparse
 import numpy as np
 
 from torch.utils import data
-from datasets import VOCSegmentation, Cityscapes
+from datasets import VOCSegmentation, Cityscapes, COCOSegmentation
 from utils import ext_transforms as et
 from metrics import StreamSegMetrics
 
@@ -128,7 +128,7 @@ def get_dataset(opts):
         val_dst = VOCSegmentation(root=opts.data_root, year=opts.year,
                                   image_set='val', download=False, transform=val_transform)
 
-    if opts.dataset == 'cityscapes':
+    elif opts.dataset == 'cityscapes':
         train_transform = et.ExtCompose([
             # et.ExtResize( 512 ),
             et.ExtRandomCrop(size=(opts.crop_size, opts.crop_size)),
@@ -150,6 +150,31 @@ def get_dataset(opts):
                                split='train', transform=train_transform)
         val_dst = Cityscapes(root=opts.data_root,
                              split='val', transform=val_transform)
+        
+    elif opts.dataset == 'coco':
+        train_transform = et.ExtCompose([
+            #et.ExtResize(520),  # Resize so the minimum size is 520
+            et.ExtRandomScale((0.5, 2.0)),
+            et.ExtRandomCrop(size=(opts.crop_size, opts.crop_size), pad_if_needed=True),
+            et.ExtRandomHorizontalFlip(),
+            et.ExtToTensor(),
+            et.ExtNormalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        
+        val_transform = et.ExtCompose([
+            #et.ExtResize(520),
+            et.ExtCenterCrop(opts.crop_size),
+            et.ExtToTensor(),
+            et.ExtNormalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+
+        train_dst = COCOSegmentation(root=opts.data_root, year='2017', image_set='train',
+                                     transform=train_transform)
+        val_dst = COCOSegmentation(root=opts.data_root, year='2017', image_set='val',
+                                   transform=val_transform)
+        
+    else:
+        raise NotImplementedError
     return train_dst, val_dst
 
 
@@ -214,6 +239,8 @@ def main():
         opts.num_classes = 21
     elif opts.dataset.lower() == 'cityscapes':
         opts.num_classes = 19
+    elif opts.dataset.lower() == 'coco':
+        opts.num_classes = 80
 
     # Setup visualization
     vis = Visualizer(port=opts.vis_port,
