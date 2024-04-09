@@ -78,10 +78,11 @@ class COCOSegmentation(Dataset):
     @staticmethod
     def decode_target(mask):
         """Decode semantic mask to RGB image"""
-        cmap = coco_cmap()  # Ensure cmap is accessible here, e.g., by making it a static method or a class variable
+        cmap = coco_cmap()
         return cmap[mask]
 
 # Adjust the transform function to work directly on both image and mask
+# This transform function is optional and can be customized as needed
 def my_transforms(image_size=(512, 512)):
     """Transforms for the input image and mask."""
     return Compose([

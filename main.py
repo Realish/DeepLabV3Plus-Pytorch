@@ -239,6 +239,7 @@ def main():
         opts.num_classes = 21
     elif opts.dataset.lower() == 'cityscapes':
         opts.num_classes = 19
+    #Consider 80 classes for coco dataset
     elif opts.dataset.lower() == 'coco':
         opts.num_classes = 80
 
