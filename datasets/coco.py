@@ -40,7 +40,7 @@ class COCOSegmentation(Dataset):
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        self.images_dir = os.path.join(root, 'COCO_{image_set}{year}', f'{image_set}{year}')
+        self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
 
         if not os.path.isdir(self.images_dir):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
