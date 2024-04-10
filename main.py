@@ -239,9 +239,9 @@ def main():
         opts.num_classes = 21
     elif opts.dataset.lower() == 'cityscapes':
         opts.num_classes = 19
-    #Consider 80 classes for coco dataset
+    #Consider 91 classes for coco dataset
     elif opts.dataset.lower() == 'coco':
-        opts.num_classes = 80
+        opts.num_classes = 91
 
     # Setup visualization
     vis = Visualizer(port=opts.vis_port,
@@ -272,7 +272,7 @@ def main():
           (opts.dataset, len(train_dst), len(val_dst)))
 
     # Set up model (all models are 'constructed at network.modeling)
-    model = network.modeling.__dict__[opts.model](num_classes=opts.num_classes, output_stride=opts.output_stride)
+    model = network.modeling.__dict__[opts.model](num_classes=opts.num_classes, output_stride=opts.output_stride, pretrained_backbone=False)
     if opts.separable_conv and 'plus' in opts.model:
         network.convert_to_separable_conv(model.classifier)
     utils.set_bn_momentum(model.backbone, momentum=0.01)
