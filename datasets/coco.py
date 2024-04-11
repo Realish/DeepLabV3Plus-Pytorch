@@ -44,7 +44,7 @@ class COCOSegmentation(Dataset):
         # self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
         self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
 
-        if not os.path.isdir(self.zip_file_path):
+        if not os.path.isfile(self.zip_file_path):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
         
         self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
