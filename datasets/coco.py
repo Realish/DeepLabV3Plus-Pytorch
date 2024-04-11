@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import torch
 from torch.utils.data import Dataset
 from pycocotools.coco import COCO
@@ -64,8 +64,14 @@ class COCOSegmentation(Dataset):
         image_zip_path = f'{self.image_set}{self.year}/{image_file_name}'
         
         # Read and open the image from the ZIP file
-        with self.zip_file.open(image_zip_path) as image_file:
-            image = Image.open(image_file).convert('RGB')
+        # with self.zip_file.open(image_zip_path) as image_file:
+        #     image = Image.open(image_file).convert('RGB')
+            
+        try:
+            with self.zip_file.open(image_zip_path) as image_file:
+                image = Image.open(image_file).convert('RGB')
+        except (OSError, UnidentifiedImageError) as e:
+            print(f"Error loading image {image_zip_path}: {e}")
 
         # Load the image
         # path = os.path.join(self.images_dir, image_info['file_name'])
