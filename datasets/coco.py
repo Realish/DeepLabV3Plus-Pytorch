@@ -35,18 +35,18 @@ class COCOSegmentation(Dataset):
         self.image_set = image_set
         self.transform = transform
 
-        self.coco = COCO(os.path.join(root, 'COCO_annotations_trainval2017', 'annotations',
+        self.coco = COCO(os.path.join(root, 'annotations',
                                       f'instances_{image_set}{year}.json'))
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
+        self.images_dir = os.path.join(root, f'{image_set}{year}')
         # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
 
         if not os.path.isfile(self.images_dir):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
         
-        self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
+        # self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
 
     def __len__(self):
         return len(self.image_ids)
