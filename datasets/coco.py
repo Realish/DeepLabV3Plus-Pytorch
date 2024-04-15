@@ -110,9 +110,9 @@ class COCOSegmentation(Dataset):
     #     # Close the ZIP file when the object is destroyed
     #     self.zip_file.close()
     
-    def __del__(self):
-        # Close the HDF5 file when the dataset object is deleted
-        self.images_h5_data.close()
+    # def __del__(self):
+    #     # Close the HDF5 file when the dataset object is deleted
+    #     self.images_h5_data.close()
 
 # Adjust the transform function to work directly on both image and mask
 # This transform function is optional and can be customized as needed
