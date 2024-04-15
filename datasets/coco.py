@@ -1,6 +1,7 @@
 import os
 import numpy as np
-from PIL import Image
+import h5py
+from PIL import Image, UnidentifiedImageError
 import torch
 from torch.utils.data import Dataset
 from pycocotools.coco import COCO
@@ -35,15 +36,20 @@ class COCOSegmentation(Dataset):
         self.image_set = image_set
         self.transform = transform
 
-        self.coco = COCO(os.path.join(root, 'COCO_annotations_trainval2017', 'annotations',
+        self.coco = COCO(os.path.join(root, 'annotations',
                                       f'instances_{image_set}{year}.json'))
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
+        # self.images_dir = os.path.join(root, f'{image_set}{year}')
+        # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
+        self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
+        self.images_h5_data = h5py.File(self.images_h5_path, 'r')
 
-        if not os.path.isdir(self.images_dir):
+        if not os.path.isfile(self.images_h5_path):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
+        
+        # self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
 
     def __len__(self):
         return len(self.image_ids)
@@ -54,10 +60,29 @@ class COCOSegmentation(Dataset):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         image_info = coco.loadImgs(img_id)[0]
+        
+        # Image file path within the ZIP file
+        # image_file_name = image_info['file_name']
+        # image_zip_path = f'{self.image_set}{self.year}/{image_file_name}'
+        
+        # Read and open the image from the ZIP file
+        # with self.zip_file.open(image_zip_path) as image_file:
+        #     image = Image.open(image_file).convert('RGB')
+            
+        # try:
+        #     with self.zip_file.open(image_zip_path) as image_file:
+        #         image = Image.open(image_file).convert('RGB')
+        # except (OSError, UnidentifiedImageError) as e:
+        #     print(f"Error loading image {image_zip_path}: {e}")
 
         # Load the image
-        path = os.path.join(self.images_dir, image_info['file_name'])
-        image = Image.open(path).convert('RGB')
+        # path = os.path.join(self.images_dir, image_info['file_name'])
+        # image = Image.open(path).convert('RGB')
+        
+        # Load the image from HDF5 file
+        image_key = f'{img_id:012d}.jpg'
+        image_data = self.images_h5_data[image_key][:]
+        image = Image.fromarray(image_data).convert('RGB')
 
         # Generate a mask image
         mask = np.zeros((image_info['height'], image_info['width']), dtype=np.uint8)
@@ -80,6 +105,14 @@ class COCOSegmentation(Dataset):
         """Decode semantic mask to RGB image"""
         cmap = coco_cmap()
         return cmap[mask]
+    
+    # def __del__(self):
+    #     # Close the ZIP file when the object is destroyed
+    #     self.zip_file.close()
+    
+    # def __del__(self):
+    #     # Close the HDF5 file when the dataset object is deleted
+    #     self.images_h5_data.close()
 
 # Adjust the transform function to work directly on both image and mask
 # This transform function is optional and can be customized as needed
