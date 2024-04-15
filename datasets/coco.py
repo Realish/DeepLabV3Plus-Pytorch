@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import h5py
 from PIL import Image, UnidentifiedImageError
 import torch
 from torch.utils.data import Dataset
@@ -40,8 +41,10 @@ class COCOSegmentation(Dataset):
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        self.images_dir = os.path.join(root, f'{image_set}{year}')
+        # self.images_dir = os.path.join(root, f'{image_set}{year}')
         # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
+        self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
+        self.images_h5_data = h5py.File(self.images_h5_path, 'r')
 
         if not os.path.isdir(self.images_dir):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
@@ -73,8 +76,13 @@ class COCOSegmentation(Dataset):
         #     print(f"Error loading image {image_zip_path}: {e}")
 
         # Load the image
-        path = os.path.join(self.images_dir, image_info['file_name'])
-        image = Image.open(path).convert('RGB')
+        # path = os.path.join(self.images_dir, image_info['file_name'])
+        # image = Image.open(path).convert('RGB')
+        
+        # Load the image from HDF5 file
+        image_key = f'{img_id:012d}.jpg'
+        image_data = self.images_h5_data[image_key][:]
+        image = Image.fromarray(image_data).convert('RGB')
 
         # Generate a mask image
         mask = np.zeros((image_info['height'], image_info['width']), dtype=np.uint8)
@@ -101,6 +109,10 @@ class COCOSegmentation(Dataset):
     # def __del__(self):
     #     # Close the ZIP file when the object is destroyed
     #     self.zip_file.close()
+    
+    def __del__(self):
+        # Close the HDF5 file when the dataset object is deleted
+        self.images_h5_data.close()
 
 # Adjust the transform function to work directly on both image and mask
 # This transform function is optional and can be customized as needed
