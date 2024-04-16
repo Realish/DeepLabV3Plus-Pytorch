@@ -36,17 +36,17 @@ class COCOSegmentation(Dataset):
         self.image_set = image_set
         self.transform = transform
 
-        self.coco = COCO(os.path.join(root, 'annotations',
+        self.coco = COCO(os.path.join(root, f'COCO_annotations_trainval{year}', 'annotations',
                                       f'instances_{image_set}{year}.json'))
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        # self.images_dir = os.path.join(root, f'{image_set}{year}')
+        self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
         # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
-        self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
-        self.images_h5_data = h5py.File(self.images_h5_path, 'r')
+        # self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
+        # self.images_h5_data = h5py.File(self.images_h5_path, 'r')
 
-        if not os.path.isfile(self.images_h5_path):
+        if not os.path.isdir(self.images_dir):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
         
         # self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
@@ -76,13 +76,13 @@ class COCOSegmentation(Dataset):
         #     print(f"Error loading image {image_zip_path}: {e}")
 
         # Load the image
-        # path = os.path.join(self.images_dir, image_info['file_name'])
-        # image = Image.open(path).convert('RGB')
+        path = os.path.join(self.images_dir, image_info['file_name'])
+        image = Image.open(path).convert('RGB')
         
         # Load the image from HDF5 file
-        image_key = f'{img_id:012d}.jpg'
-        image_data = self.images_h5_data[image_key][:]
-        image = Image.fromarray(image_data).convert('RGB')
+        # image_key = f'{img_id:012d}.jpg'
+        # image_data = self.images_h5_data[image_key][:]
+        # image = Image.fromarray(image_data).convert('RGB')
 
         # Generate a mask image
         mask = np.zeros((image_info['height'], image_info['width']), dtype=np.uint8)
