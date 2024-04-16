@@ -9,3 +9,6 @@ results
 checkpoints_bak
 cityscapes
 test_results
+datasets/data/
+.ipynb_checkpoints/
+Untitled.ipynb
