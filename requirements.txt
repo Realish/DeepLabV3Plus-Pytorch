@@ -8,3 +8,4 @@ matplotlib
 visdom
 pycocotools
 visdom
+h5py
