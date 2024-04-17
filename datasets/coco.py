@@ -41,7 +41,7 @@ class COCOSegmentation(Dataset):
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
         
-        self.images_dir = os.path.join(root, f'COCO_{image_set}{year}', f'{image_set}{year}')
+        self.images_dir = os.path.join(root, f'{image_set}{year}')
         # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
         # self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
         # self.images_h5_data = h5py.File(self.images_h5_path, 'r')
