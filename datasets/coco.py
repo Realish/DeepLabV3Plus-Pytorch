@@ -36,7 +36,7 @@ class COCOSegmentation(Dataset):
         self.image_set = image_set
         self.transform = transform
 
-        self.coco = COCO(os.path.join(root, f'COCO_annotations_trainval{year}', 'annotations',
+        self.coco = COCO(os.path.join(root, 'annotations',
                                       f'instances_{image_set}{year}.json'))
         self.image_ids = self.coco.getImgIds()
         self.cmap = coco_cmap()
