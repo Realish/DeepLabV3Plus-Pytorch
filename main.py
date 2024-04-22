@@ -171,7 +171,7 @@ def get_dataset(opts):
         train_dst = COCOSegmentation(root=opts.data_root, year='2017', image_set='train',
                                      transform=train_transform)
         val_dst = COCOSegmentation(root=opts.data_root, year='2017', image_set='val',
-                                   transform=val_transform)
+                                transform=val_transform)
         
     else:
         raise NotImplementedError
