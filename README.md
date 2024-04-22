@@ -243,6 +243,61 @@ python main.py --model deeplabv3plus_mobilenet --enable_vis --vis_port 28333 --g
 python main.py --model deeplabv3plus_mobilenet --dataset cityscapes --enable_vis --vis_port 28333 --gpu_id 0  --lr 0.1  --crop_size 768 --batch_size 16 --output_stride 16 --data_root ./datasets/data/cityscapes 
 ```
 
+## COCO 2017
+
+### 1. Training
+
+a. Place the extracted COCO 2017 train and validation image sets as well as annotation json files in the following paths:
+
+```
+/datasets
+    /data
+        /train2017
+        /val2017
+        /annotations
+```
+
+b. To start the training run the training script in the terminal, for example for resnet101 backbone:
+
+```bash
+python main.py --model deeplabv3plus_resnet101 --dataset coco --gpu_id 0  --lr 0.1  --crop_size 513 --batch_size 64 --val_batch_size 64 --output_stride 16 --total_itrs 40000 --data_root ./datasets/data/
+```
+
+c. If training session is disrupted, the model can be run from latest checkpoint, for instance for resnet101 backbone:
+
+```bash
+python main.py --model deeplabv3plus_resnet101 --dataset coco --gpu_id 0  --lr 0.1  --crop_size 513 --batch_size 64 --val_batch_size 64 --output_stride 16 --total_itrs 40000 --data_root ./datasets/data/ --ckpt checkpoints/latest_deeplabv3plus_resnet101_coco_os16.pth --continue_training
+```
+
+### 2. Test and Validation
+
+a. Place the extracted COCO 2017 train, val, and test image sets as well as annottion json files in their corresponding paths as follows:
+
+```
+/datasets
+    /data
+        /test2017
+        /train2017
+        /val2017
+        /annotations
+```
+
+b. To extract validation metrics, and test segmentation accuracy of the model on validation set run the validation script. For instance for ResNet101 validation script can be as follows:
+
+```bash
+python main.py --model deeplabv3plus_resnet101 --dataset coco --gpu_id 0 --crop_val --lr 0.01 --crop_size 513 --batch_size 16 --output_stride 16 --ckpt checkpoints/best_deeplabv3plus_resnet101_coco_os16.pth --test_only --save_val_results 
+```
+
+This will print out the metrics at the end of the run, and place segmentation results in the '/results' folder.
+
+c. To produce the segmentation results for test set, run the prediction script. For instance the following script is for resnet101 backbone:
+
+```bash
+python predict.py --input datasets/data/test2017  --dataset coco --model deeplabv3plus_resnet101 --ckpt checkpoints/best_deeplabv3plus_resnet101_coco_os16.pth --save_val_results_to test_results
+```
+
+This will save the results in the '/test_results' directory.
+
 ## Reference
 
 [1] [Rethinking Atrous Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1706.05587)
