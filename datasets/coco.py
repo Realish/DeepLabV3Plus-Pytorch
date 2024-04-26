@@ -42,14 +42,10 @@ class COCOSegmentation(Dataset):
         self.cmap = coco_cmap()
         
         self.images_dir = os.path.join(root, f'{image_set}{year}')
-        # self.zip_file_path = os.path.join(root, f'COCO_{image_set}{year}.zip')
-        # self.images_h5_path = os.path.join(root, f'{image_set}{year}.h5')
-        # self.images_h5_data = h5py.File(self.images_h5_path, 'r')
 
         if not os.path.isdir(self.images_dir):
             raise RuntimeError('Dataset not found or incomplete. Please make sure all required folders are present.')
         
-        # self.zip_file = zipfile.ZipFile(self.zip_file_path, 'r')
 
     def __len__(self):
         return len(self.image_ids)
@@ -60,29 +56,10 @@ class COCOSegmentation(Dataset):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         image_info = coco.loadImgs(img_id)[0]
-        
-        # Image file path within the ZIP file
-        # image_file_name = image_info['file_name']
-        # image_zip_path = f'{self.image_set}{self.year}/{image_file_name}'
-        
-        # Read and open the image from the ZIP file
-        # with self.zip_file.open(image_zip_path) as image_file:
-        #     image = Image.open(image_file).convert('RGB')
-            
-        # try:
-        #     with self.zip_file.open(image_zip_path) as image_file:
-        #         image = Image.open(image_file).convert('RGB')
-        # except (OSError, UnidentifiedImageError) as e:
-        #     print(f"Error loading image {image_zip_path}: {e}")
 
         # Load the image
         path = os.path.join(self.images_dir, image_info['file_name'])
         image = Image.open(path).convert('RGB')
-        
-        # Load the image from HDF5 file
-        # image_key = f'{img_id:012d}.jpg'
-        # image_data = self.images_h5_data[image_key][:]
-        # image = Image.fromarray(image_data).convert('RGB')
 
         # Generate a mask image
         mask = np.zeros((image_info['height'], image_info['width']), dtype=np.uint8)
@@ -106,13 +83,6 @@ class COCOSegmentation(Dataset):
         cmap = coco_cmap()
         return cmap[mask]
     
-    # def __del__(self):
-    #     # Close the ZIP file when the object is destroyed
-    #     self.zip_file.close()
-    
-    # def __del__(self):
-    #     # Close the HDF5 file when the dataset object is deleted
-    #     self.images_h5_data.close()
 
 # Adjust the transform function to work directly on both image and mask
 # This transform function is optional and can be customized as needed
@@ -124,6 +94,3 @@ def my_transforms(image_size=(512, 512)):
         # Normalize only the image, if necessary
         # Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-
-# Example of how to instantiate the dataset with transforms
-# dataset = COCOSegmentation(root='path/to/coco', transform=my_transforms())
